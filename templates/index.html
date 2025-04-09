@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Primer práctica</title>
+</head>
+
+<body>
+
+    <div id="contenedorPrincipal">
+        <h1>Lista de Tareas</h1>
+
+        <form action="/add" method="POST">
+            <input type="text" name="titulo" placeholder="Nueva tarea" required>
+            <button type="submit">Agregar</button>
+        </form>
+
+        <ul>
+            {{range .}}
+            <li>
+                <!-- Botón para marcar la tarea como cumplida -->
+                <form action="/toggle" method="POST">
+                    <input type="hidden" name="id" value="{{.ID}}">
+                    <button type="submit">
+                        {{if .Hecho}}✅{{else}}⬜{{end}}
+                    </button>
+                </form>
+                <!-- Mostrar el título de la tarea con formato -->
+                <span>
+                    {{.Titulo}}
+                </span>
+
+                <!-- Botón para eliminar tarea -->
+                <form action="/delete?id={{ .ID }}" method="POST">
+                    <input type="hidden" name="id" value="{{.ID}}">
+                    <button type="submit"
+                        onclick="return confirm('¿Estás seguro que querés eliminar esta tarea?')">Eliminar</button>
+                </form>
+            </li>
+            {{else}}
+            <li>No hay tareas aún</li>
+            {{end}}
+        </ul>
+
+    </div>
+</body>
+
+</html>
