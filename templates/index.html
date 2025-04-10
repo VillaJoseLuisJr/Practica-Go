@@ -21,17 +21,19 @@
         <ul>
             {{range .}}
             <li>
+
+                <!-- Mostrar el título de la tarea con formato -->
+                <span>
+                    {{.Titulo}}
+                </span>
+
                 <!-- Botón para marcar la tarea como cumplida -->
-                <form action="/toggle" method="POST">
+                <form action="/toggle?id={{ .ID }}&hecho={{ .Hecho }}" method="POST">
                     <input type="hidden" name="id" value="{{.ID}}">
                     <button type="submit">
                         {{if .Hecho}}✅{{else}}⬜{{end}}
                     </button>
                 </form>
-                <!-- Mostrar el título de la tarea con formato -->
-                <span>
-                    {{.Titulo}}
-                </span>
 
                 <!-- Botón para eliminar tarea -->
                 <form action="/delete?id={{ .ID }}" method="POST">

@@ -25,9 +25,9 @@ var templates = template.Must(template.ParseFiles("templates/index.html")) //Mus
 func main() {
 	initDB() //inicializar conexión con MySQL
 
-	http.HandleFunc("/", indexHandler)  //Ruta para mostrar las tareas
-	http.HandleFunc("/add", addHandler) //Ruta para agregar las tareas
-	//http.HandleFunc("/toggle", toggleHandler) //Ruta para marcar las tareas como completadas (Por ahora no lo saco)
+	http.HandleFunc("/", indexHandler)                                                         //Ruta para mostrar las tareas
+	http.HandleFunc("/add", addHandler)                                                        //Ruta para agregar las tareas
+	http.HandleFunc("/toggle", toggleHandler)                                                  //Ruta para marcar las tareas como completadas (Por ahora no lo saco)
 	http.HandleFunc("/delete", deleteHandler)                                                  //Ruta para elimitar tareas
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static")))) //Ruta para traer el CSS al HTML
 
@@ -82,31 +82,30 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-/* func toggleHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		//Parsear el formulario para obtener el ID
-		r.ParseForm()
-		idStr := r.FormValue("id")
+func toggleHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	hecho := r.URL.Query().Get("hecho") // "true" o "false"
 
-		//Convierte el ID de la tarea a entero
-		var id int
-		fmt.Sscanf(idStr, "%d", &id)
-
-		//Uso mutex para que no haya problema al modificar la lista de tareas
-		mu.Lock()
-		defer mu.Unlock()
-
-		//Busca la tarea por ID y cambia el estado de "Hecho"
-		for i := range tareas {
-			if tareas[i].ID == id {
-				tareas[i].Hecho = !tareas[i].Hecho //Cambia el estado de "Hecho"
-				break
-			}
-		}
+	if id == "" || hecho == "" {
+		http.Error(w, "Parámetros inválidos", http.StatusBadRequest)
+		return
 	}
+
+	//Convierte el string "true"/"false" a su opuesto para alternar
+	newHecho := "0"
+	if hecho == "false" {
+		newHecho = "1"
+	}
+
+	_, err := db.Exec("UPDATE tareas SET hecho = ? WHERE id = ?", newHecho, id)
+	if err != nil {
+		http.Error(w, "Error al actualizar la tarea", http.StatusInternalServerError)
+		return
+	}
+
 	//Despues de procesar se redirige a la pagina principal
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-} */
+}
 
 //Handler para eliminar una tarea
 
