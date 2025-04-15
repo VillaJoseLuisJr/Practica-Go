@@ -23,6 +23,13 @@
         <p><em>No hay imagen</em></p>
         {{end}}
 
+        <!-- Formulario para eliminar producto -->
+        <form action="/eliminar" method="post"
+            onsubmit="return confirm('¿Estás seguro de que querés eliminar este producto?');">
+            <input type="hidden" name="id" value="{{.ID}}">
+            <button type="submit">Eliminar</button>
+        </form>
+
     </div>
     {{end}}
 </body>

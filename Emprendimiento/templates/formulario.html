@@ -12,12 +12,12 @@
     <h1>Agregar un nuevo Producto</h1>
     <form action="/guardar" method="post" enctype="multipart/form-data">
         <label for="nombre">Nombre del producto:</label>
-        <input type="text" name="nombre" id="nombre"><br><br>
+        <input type="text" name="nombre" id="nombre" required maxlength="100"><br><br>
 
         <label for="descripcion">Descripción:</label>
-        <textarea name="descripcion" id="descripcion"></textarea><br><br>
+        <textarea name="descripcion" id="descripcion" required maxlength="300"></textarea><br><br>
 
-        <input type="file" name="imagen" id="imagen"><br>
+        <input type="file" name="imagen" id="imagen" accept="image/png, image/jpeg, image/gif"><br><br>
 
         <button type="submit">Guardar producto</button>
     </form>

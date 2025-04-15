@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html"
 	"html/template"
 	"io"
 	"log"
@@ -26,7 +27,7 @@ func mostrarProductos(w http.ResponseWriter, r *http.Request) {
 	// Obtener los productos de la base de datos
 	filas, err := db.Query("SELECT id, nombre, descripcion, imagen FROM productos")
 	if err != nil {
-		log.Println("Error al hacer la consulta", err)
+		log.Println("Error al obtener productos", err)
 		http.Error(w, "Error al obtener productos", http.StatusInternalServerError)
 		return
 	}
@@ -39,7 +40,7 @@ func mostrarProductos(w http.ResponseWriter, r *http.Request) {
 		var p Producto
 		err := filas.Scan(&p.ID, &p.Nombre, &p.Descripcion, &p.Imagen)
 		if err != nil {
-			log.Println("Error al renderizar template", err)
+			log.Println("Error al leer productos", err)
 			http.Error(w, "Error al leer productos", http.StatusInternalServerError)
 			return
 		}
@@ -48,6 +49,7 @@ func mostrarProductos(w http.ResponseWriter, r *http.Request) {
 
 	// Renderizar el template
 	if err := templates.Execute(w, productos); err != nil {
+		log.Println("Error al renderizar plantilla", err)
 		http.Error(w, "Error al renderizar plantilla", http.StatusInternalServerError)
 	}
 	//templates.Execute(w, productos)
@@ -76,6 +78,7 @@ func init() {
 func mostrarFormulario(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("templates/formulario.html")
 	if err != nil {
+		log.Println("Error cargando template", err)
 		http.Error(w, "Error cargando template", http.StatusInternalServerError)
 		return
 	}
@@ -90,8 +93,8 @@ func guardarProducto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Obtener datos del formulario
-	Nombre := r.FormValue("nombre")
-	Descripcion := r.FormValue("descripcion")
+	Nombre := html.EscapeString(r.FormValue("nombre"))
+	Descripcion := html.EscapeString(r.FormValue("descripcion"))
 
 	// Código para manejar la imagen y comprobar que sea un tipo válido
 	file, handler, err := r.FormFile("imagen")
@@ -157,6 +160,42 @@ func guardarProducto(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Funcion para eliminar productos
+func eliminarProducto(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	id := r.FormValue("id")
+
+	// Obtener el nombre de la imagen antes de eliminar el producto
+	var imagen string
+	err := db.QueryRow("SELECT imagen FROM productos WHERE id = ?", id).Scan(&imagen)
+	if err != nil {
+		log.Println("Error al buscar la imagen", err)
+		http.Error(w, "Error al buscar la imagen", http.StatusInternalServerError)
+		return
+	}
+
+	// Eliminar producto por ID
+	_, err = db.Exec("DELETE FROM productos WHERE id = ?", id)
+	if err != nil {
+		log.Println("Error al eliminar producto", err)
+		http.Error(w, "Error al eliminar producto", http.StatusInternalServerError)
+		return
+	}
+
+	// Borrar el archivo de imagen del sistema
+	err = os.Remove("./imagenes/" + imagen)
+	if err != nil && !os.IsNotExist(err) {
+		// Si hubo error distinto de "archivo no existe", mostrarlo
+		log.Println("Error al eliminar imagen:", err)
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func main() {
 	// Maneja archivos estáticos (CSS, imágenes, etc.)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
@@ -166,6 +205,7 @@ func main() {
 	http.HandleFunc("/", mostrarProductos)
 	http.HandleFunc("/formulario", mostrarFormulario)
 	http.HandleFunc("/guardar", guardarProducto)
+	http.HandleFunc("/eliminar", eliminarProducto)
 
 	// Inicia el servidor en puerto 8080
 	log.Println("Servidor iniciado en http://localhost:8080")
