@@ -2,8 +2,10 @@ package main
 
 import (
 	"html/template"
+	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"database/sql"
 
@@ -82,20 +84,75 @@ func mostrarFormulario(w http.ResponseWriter, r *http.Request) {
 
 // Función para guardar el producto en la base de datos
 func guardarProducto(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		// Obtener datos del formulario
-		Nombre := r.FormValue("nombre")
-		Descripcion := r.FormValue("descripcion")
-		// Código para manejar la imagen, lo dejamos para después
+	//Redirigir a la página de productos
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
 
-		// Guardar el producto en la base de datos
-		_, err := db.Exec("INSERT INTO productos (nombre, descripcion) VALUES (?, ?)", Nombre, Descripcion)
+	// Obtener datos del formulario
+	Nombre := r.FormValue("nombre")
+	Descripcion := r.FormValue("descripcion")
+
+	// Código para manejar la imagen y comprobar que sea un tipo válido
+	file, handler, err := r.FormFile("imagen")
+	var nombreArchivo string
+
+	if err == nil {
+		defer file.Close()
+
+		// Leer los primeros 512 bytes para detectar el tipo MIME del archivo
+		buffer := make([]byte, 512)
+		_, err = file.Read(buffer)
 		if err != nil {
-			http.Error(w, "Error al guardar el producto", http.StatusInternalServerError)
+			log.Println("Error al leer la cabecera del archivo:", err)
+			http.Error(w, "Error al procesar la imagen", http.StatusInternalServerError)
 			return
 		}
 
-		//Redirigir a la página de productos
+		filetype := http.DetectContentType(buffer)
+		log.Println("Tipo detectado:", filetype)
+
+		// Verificar que sea un tipo de imagen permitido
+		if filetype != "image/jpeg" && filetype != "image/png" && filetype != "image/gif" {
+			log.Println("Tipo de archivo no permitido:", filetype)
+			http.Error(w, "Formato de imagen no permitido", http.StatusBadRequest)
+			return
+		}
+
+		// Volver el puntero al inicio porque ya leímos parte del archivo
+		file.Seek(0, 0)
+
+		// Guardar el archivo en la carpeta ./imagenes/
+		nombreArchivo = handler.Filename
+		ruta := "./imagenes/" + nombreArchivo
+		destino, err := os.Create(ruta)
+		if err != nil {
+			log.Println("Error al crear archivo en servidor:", err)
+			http.Error(w, "No se pudo guardar la imagen", http.StatusInternalServerError)
+			return
+		}
+		defer destino.Close()
+
+		_, err = io.Copy(destino, file)
+		if err != nil {
+			log.Println("Error al copiar imagen:", err)
+			http.Error(w, "Error al guardar la imagen", http.StatusInternalServerError)
+			return
+		}
+
+		// Guardar en la base de datos
+		stmt, err := db.Prepare("INSERT INTO productos(nombre, descripcion, imagen) VALUES (?, ?, ?)")
+		if err != nil {
+			log.Println("Error al preparar statement:", err)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
+		_, err = stmt.Exec(Nombre, Descripcion, ruta)
+		if err != nil {
+			log.Println("Error al ejecutar insert", err)
+		}
+
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
