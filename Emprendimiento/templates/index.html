@@ -10,7 +10,21 @@
 
 <body>
     <h1>Bienvenido a mi página jijolín</h1>
-    <p>Pronto vas a poder ver los productos acá jjijjo</p>
+
+    <div class="productos">
+        {{range .}}
+        <h2>{{.Nombre}}</h2>
+        <p>{{.Descripcion}}</p>
+        <p>El ID de este producto es: {{.ID}}</p>
+
+        {{if .Imagen.Valid}}
+        <img src="{{.Imagen.String}}" alt="Imagen del producto" width="200">
+        {{else}}
+        <p><em>No hay imagen</em></p>
+        {{end}}
+
+    </div>
+    {{end}}
 </body>
 
 </html>
