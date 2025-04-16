@@ -11,25 +11,26 @@
 <body>
     <h1>Bienvenido a mi página jijolín</h1>
 
+    <a href="/formulario">Cargar productos</a>
+
+    {{range .}}
     <div class="productos">
-        {{range .}}
         <h2>{{.Nombre}}</h2>
         <p>{{.Descripcion}}</p>
         <p>El ID de este producto es: {{.ID}}</p>
 
         {{if .Imagen.Valid}}
-        <img src="{{.Imagen.String}}" alt="Imagen del producto" width="200">
+        <img src="{{.Imagen.String}}" alt="{{ .Nombre }}" width="200">
         {{else}}
         <p><em>No hay imagen</em></p>
         {{end}}
-
+        <br><br>
         <!-- Formulario para eliminar producto -->
         <form action="/eliminar" method="post"
             onsubmit="return confirm('¿Estás seguro de que querés eliminar este producto?');">
             <input type="hidden" name="id" value="{{.ID}}">
             <button type="submit">Eliminar</button>
         </form>
-
     </div>
     {{end}}
 </body>

@@ -1,7 +1,17 @@
 body {
-    background-color: chocolate;
+    background-color:burlywood;
 }
 
 h1 {
-    color: chartreuse;
+    color:darkgreen;
+}
+
+.productos {
+    border-color: black;
+    border-radius: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px;
+    padding: 15px;
 }

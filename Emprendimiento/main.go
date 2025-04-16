@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"database/sql"
 
@@ -98,7 +100,7 @@ func guardarProducto(w http.ResponseWriter, r *http.Request) {
 
 	// Código para manejar la imagen y comprobar que sea un tipo válido
 	file, handler, err := r.FormFile("imagen")
-	var nombreArchivo string
+	var nombreImagen string
 
 	if err == nil {
 		defer file.Close()
@@ -126,8 +128,11 @@ func guardarProducto(w http.ResponseWriter, r *http.Request) {
 		file.Seek(0, 0)
 
 		// Guardar el archivo en la carpeta ./imagenes/
-		nombreArchivo = handler.Filename
-		ruta := "./imagenes/" + nombreArchivo
+		nombreArchivo := filepath.Base(handler.Filename)
+		ruta := filepath.Join("imagenes", nombreArchivo)
+		ruta = strings.ReplaceAll(ruta, "\\", "/")
+		log.Println("Guardando imagen en:", ruta)
+
 		destino, err := os.Create(ruta)
 		if err != nil {
 			log.Println("Error al crear archivo en servidor:", err)
@@ -143,21 +148,24 @@ func guardarProducto(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Guardar en la base de datos
-		stmt, err := db.Prepare("INSERT INTO productos(nombre, descripcion, imagen) VALUES (?, ?, ?)")
-		if err != nil {
-			log.Println("Error al preparar statement:", err)
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
+		nombreImagen = ruta
 
-		_, err = stmt.Exec(Nombre, Descripcion, ruta)
-		if err != nil {
-			log.Println("Error al ejecutar insert", err)
-		}
-
-		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
+
+	// Guardar en la base de datos
+	stmt, err := db.Prepare("INSERT INTO productos(nombre, descripcion, imagen) VALUES (?, ?, ?)")
+	if err != nil {
+		log.Println("Error al preparar statement:", err)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	_, err = stmt.Exec(Nombre, Descripcion, nombreImagen)
+	if err != nil {
+		log.Println("Error al ejecutar insert", err)
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 // Funcion para eliminar productos
