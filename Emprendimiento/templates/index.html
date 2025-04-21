@@ -9,9 +9,14 @@
 </head>
 
 <body>
-    <h1>Bienvenido a mi página jijolín</h1>
+    <h1><a href="index.html">Bienvenido a mi página jijolín</a></h1>
 
     <a href="/formulario">Cargar productos</a>
+
+    <form action="/buscar" method="get">
+        <input type="text" name="busqueda" placeholder="Buscar productos..." required>
+        <button type="submit">Buscar</button>
+    </form> <br><br>
 
     {{range .}}
     <div class="productos">

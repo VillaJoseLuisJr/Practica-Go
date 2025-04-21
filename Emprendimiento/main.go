@@ -204,6 +204,50 @@ func eliminarProducto(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+// Función para barra de busqueda de productos
+func buscarProductos(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/emprendimiento_go")
+	if err != nil {
+		log.Println("Error al conectar con la base de datos", err)
+		http.Error(w, "Error de servidor", http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	query := r.FormValue("busqueda")
+	log.Println("Busqueda recibida:", query)
+
+	querySQL := `SELECT id, nombre, descripcion, imagen FROM productos 
+					WHERE nombre LIKE ? OR descripcion LIKE ?`
+
+	busqueda := "%" + query + "%"
+	rows, err := db.Query(querySQL, busqueda, busqueda)
+	if err != nil {
+		log.Println("Error al hacer la busqueda:", err)
+		http.Error(w, "Error al buscar productos", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var productos []Producto
+	for rows.Next() {
+		var p Producto
+		err := rows.Scan(&p.ID, &p.Nombre, &p.Descripcion, &p.Imagen)
+		if err != nil {
+			log.Println("Error al leer producto", err)
+			continue
+		}
+		productos = append(productos, p)
+	}
+
+	err = templates.ExecuteTemplate(w, "index.html", productos)
+	if err != nil {
+		log.Println("Error al renderizar resultados:", err)
+		http.Error(w, "Error de servidor", http.StatusInternalServerError)
+		return
+	}
+}
+
 func main() {
 	// Maneja archivos estáticos (CSS, imágenes, etc.)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
@@ -214,6 +258,7 @@ func main() {
 	http.HandleFunc("/formulario", mostrarFormulario)
 	http.HandleFunc("/guardar", guardarProducto)
 	http.HandleFunc("/eliminar", eliminarProducto)
+	http.HandleFunc("/buscar", buscarProductos)
 
 	// Inicia el servidor en puerto 8080
 	log.Println("Servidor iniciado en http://localhost:8080")
