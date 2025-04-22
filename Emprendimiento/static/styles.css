@@ -3,15 +3,31 @@ body {
 }
 
 h1 {
-    color:darkgreen;
+    text-decoration: none;
+}
+
+h2 {
+    color: #69d2e7 
 }
 
 .productos {
-    border-color: black;
-    border-radius: 5%;
-    display: flex;
+    background-color: #e0e4cc;
+    border-radius: 25px;
+    display: grid;
     justify-content: center;
     align-items: center;
     margin: 15px;
     padding: 15px;
+    border: medium solid black;
+    width: 600px;
+}
+
+p {
+    color: #f38630;
+}
+
+a {
+    text-decoration: none;
+    background-color: none;
+    color: #fa6900;
 }
