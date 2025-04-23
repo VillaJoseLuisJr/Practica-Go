@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
     <title>Emprendimiento</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
@@ -18,26 +21,32 @@
         <button type="submit">Buscar</button>
     </form> <br><br>
 
-    {{range .}}
-    <div class="productos">
-        <h2>{{.Nombre}}</h2>
-        <p>{{.Descripcion}}</p>
-        <p>El ID de este producto es: {{.ID}}</p>
+    <div class="div-principal">
 
-        {{if .Imagen.Valid}}
-        <img src="{{.Imagen.String}}" alt="{{ .Nombre }}" width="200">
-        {{else}}
-        <p><em>No hay imagen</em></p>
+        {{range .}}
+        <div class="productos">
+            <h2>{{.Nombre}}</h2>
+            <p>{{.Descripcion}}</p>
+            <p>El ID de este producto es: {{.ID}}</p>
+
+            <div id="imagenes">
+                {{if .Imagen.Valid}}
+                <img src="{{.Imagen.String}}" alt="{{ .Nombre }}">
+                {{else}}
+                <p><em>No hay imagen</em></p>
+                {{end}}
+            </div>
+            <br><br>
+            <!-- Formulario para eliminar producto -->
+            <form action="/eliminar" method="post"
+                onsubmit="return confirm('¿Estás seguro de que querés eliminar este producto?');">
+                <input type="hidden" name="id" value="{{.ID}}">
+                <button type="submit">Eliminar</button>
+            </form>
+        </div>
         {{end}}
-        <br><br>
-        <!-- Formulario para eliminar producto -->
-        <form action="/eliminar" method="post"
-            onsubmit="return confirm('¿Estás seguro de que querés eliminar este producto?');">
-            <input type="hidden" name="id" value="{{.ID}}">
-            <button type="submit">Eliminar</button>
-        </form>
     </div>
-    {{end}}
+
 </body>
 
 </html>

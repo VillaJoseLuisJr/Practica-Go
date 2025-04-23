@@ -1,5 +1,8 @@
 body {
     background-color:burlywood;
+    font-family: "Special Gothic Expanded One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
 h1 {
@@ -10,16 +13,21 @@ h2 {
     color: #69d2e7 
 }
 
+.div-principal {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
 .productos {
     background-color: #e0e4cc;
     border-radius: 25px;
     display: grid;
-    justify-content: center;
-    align-items: center;
-    margin: 15px;
-    padding: 15px;
+    
+    margin: 2vw;
+    padding: 2vw;
     border: medium solid black;
-    width: 600px;
+    width: 85vw;
 }
 
 p {
@@ -30,4 +38,18 @@ a {
     text-decoration: none;
     background-color: none;
     color: #fa6900;
+}
+
+#imagenes {
+    width: 30vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+}
+
+@media (max-width: 1250px) {
+    #imagenes {
+        width: 80%;
+    }
 }
