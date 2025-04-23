@@ -16,35 +16,41 @@
 
     <a href="/formulario">Cargar productos</a>
 
-    <form action="/buscar" method="get">
-        <input type="text" name="busqueda" placeholder="Buscar productos..." required>
-        <button type="submit">Buscar</button>
+    <form action="/buscar" method="get" class="form-busqueda">
+        <input type="text" name="busqueda" placeholder="Buscar productos..." required class="barra-busqueda">
+        <button type="submit" class="boton">Buscar</button>
     </form> <br><br>
 
     <div class="div-principal">
 
         {{range .}}
         <div class="productos">
-            <h2>{{.Nombre}}</h2>
-            <p>{{.Descripcion}}</p>
-            <p>El ID de este producto es: {{.ID}}</p>
+            <div class="div-texto">
+                <h2>{{.Nombre}}</h2>
+                <p>{{.Descripcion}}</p>
+                <p>El ID de este producto es: {{.ID}}</p>
+            </div>
 
-            <div id="imagenes">
+            <div class="div-imagenes">
                 {{if .Imagen.Valid}}
                 <img src="{{.Imagen.String}}" alt="{{ .Nombre }}">
                 {{else}}
                 <p><em>No hay imagen</em></p>
                 {{end}}
             </div>
-            <br><br>
-            <!-- Formulario para eliminar producto -->
-            <form action="/eliminar" method="post"
-                onsubmit="return confirm('¿Estás seguro de que querés eliminar este producto?');">
-                <input type="hidden" name="id" value="{{.ID}}">
-                <button type="submit">Eliminar</button>
-            </form>
+
+            <div class="div-boton">
+                <!-- Formulario para eliminar producto -->
+                <form action="/eliminar" method="post"
+                    onsubmit="return confirm('¿Estás seguro de que querés eliminar este producto?');">
+                    <input type="hidden" name="id" value="{{.ID}}">
+                    <button type="submit" class="boton">Eliminar</button>
+                </form>
+            </div>
+
         </div>
         {{end}}
+
     </div>
 
 </body>

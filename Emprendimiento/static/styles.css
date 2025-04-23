@@ -1,37 +1,21 @@
-body {
-    background-color:burlywood;
-    font-family: "Special Gothic Expanded One", sans-serif;
+* {
+        font-family: "Special Gothic Expanded One", sans-serif;
     font-weight: 400;
     font-style: normal;
 }
 
-h1 {
-    text-decoration: none;
+body {
+    background-color:burlywood;
 }
 
 h2 {
-    color: #69d2e7 
-}
-
-.div-principal {
-    display: grid;
-    justify-content: center;
-    align-items: center;
-}
-
-.productos {
-    background-color: #e0e4cc;
-    border-radius: 25px;
-    display: grid;
-    
-    margin: 2vw;
-    padding: 2vw;
-    border: medium solid black;
-    width: 85vw;
+    color: #69d2e7;
+    margin: 0;
 }
 
 p {
     color: #f38630;
+    margin: 0;
 }
 
 a {
@@ -40,16 +24,86 @@ a {
     color: #fa6900;
 }
 
-#imagenes {
-    width: 30vw;
-    display: flex;
+.form-busqueda {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+}
+
+.barra-busqueda {
+    background-color: aqua;
+    color: black;
+    border-color: black;
+    border-radius: 50px;
+    width: 95%;;
+    min-height: 3vw;
+    max-height: 5vw;
+    margin-top: 1rem;
+}
+
+.div-principal {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(30vw, 1fr));
+    grid-template-rows: auto;
+    gap: 20px;
+}
+
+.productos {
+    background-color: #e0e4cc;
+    border-radius: 25px;
+    display: grid;    
+    padding: 2vw;
+    border: medium solid black;
+    height: 25rem;
+    grid-template-rows: 30% 60% 10%;
+}
+
+.div-texto {
+    height: max-content;
+}
+
+.div-imagenes {
+    display: grid;
     align-items: center;
     justify-content: center;
     justify-items: center;
+
 }
 
-@media (max-width: 1250px) {
-    #imagenes {
-        width: 80%;
-    }
+img {
+    width: 80%;
+    height: min-content;
+    border-radius: 25px;
 }
+
+.div-boton {
+    display: flex;
+    justify-content: center;
+    position-anchor:initial;
+}
+
+.boton {
+    background-color:blue;
+    color: white;
+    border-radius: 5px;
+    max-width:fit-content;
+    min-width: 10vw;
+    height: 100%;
+    font-size: large;
+}
+
+@media (max-width: 767px) {
+    .div-principal {
+    grid-template-columns: repeat(auto-fill, minmax(50vw, 1fr));
+    }
+
+    .productos {
+        height: 65vh;
+    }
+
+    img {
+        width: 80vw;
+        height: 80vw;
+    }
+  }
