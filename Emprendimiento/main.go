@@ -261,7 +261,7 @@ func main() {
 	http.HandleFunc("/buscar", buscarProductos)
 
 	// Inicia el servidor en puerto 8080
-	log.Println("Servidor iniciado en http://localhost:8080")
+	log.Println("Servidor iniciado en http://localhost:8081")
 	// Si hay un error al iniciar el servidor, lo registra y corta el programa
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8081", nil))
 }
