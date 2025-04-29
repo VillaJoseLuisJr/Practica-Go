@@ -13,22 +13,32 @@
 </head>
 
 <body>
-    <h1>Agregar un nuevo Producto</h1>
-    <form action="/guardar" method="post" enctype="multipart/form-data">
-        <label for="nombre">Nombre del producto:</label>
-        <input type="text" name="nombre" id="nombre" required maxlength="100"><br><br>
+    <div class="agregar-productos">
+        <h1>Agregar un nuevo Producto</h1>
 
-        <label for="descripcion">Descripción:</label>
-        <textarea name="descripcion" id="descripcion" required maxlength="300"></textarea><br><br>
+        <div class="div-formulario-producto">
+            <form action="/guardar" method="post" enctype="multipart/form-data" class="formulario-producto">
+                <div class="div-nombre">
+                    <label for="nombre">Nombre del producto:</label>
+                    <input type="text" name="nombre" id="nombre" required maxlength="100">
 
-        <input type="file" name="imagen" id="imagen"><br><br>
+                </div>
 
-        <button type="submit">Guardar producto</button>
-    </form>
+                <div class="div-descripcion">
+                    <label for="descripcion">Descripción:</label>
+                    <textarea name="descripcion" id="descripcion" required maxlength="300"></textarea>
 
-    <br>
+                </div>
 
-    <a href="/">Ver productos</a>
+                <input type="file" name="imagen" id="imagen">
+
+                <button type="submit" class="boton" id="boton-guardar">Guardar producto</button>
+            </form>
+        </div>
+
+        <a href="/" class="cargar-ver-prod">Ver productos</a>
+
+    </div>
 </body>
 
 </html>
