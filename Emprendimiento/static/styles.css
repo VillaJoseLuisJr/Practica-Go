@@ -105,7 +105,7 @@ input[type=text] {
     padding: 2rem;
 }
 
-.productos {
+.producto {
     background-color: #e0e4cc;
     border-radius: 25px;
     display: grid;    
@@ -225,7 +225,7 @@ footer {
     grid-template-columns: repeat(auto-fill, minmax(50vw, 1fr));
     }
 
-    .productos {
+    .producto {
         height: 35rem;
         margin: 0.5rem;
         padding: 1rem;

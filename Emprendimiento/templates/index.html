@@ -10,6 +10,7 @@
     <title>Emprendimiento</title>
     <link rel="stylesheet" href="/static/styles.css">
     <script src="https://kit.fontawesome.com/dd34f7d4ea.js" crossorigin="anonymous"></script>
+    <script src="/static/buscador.js" defer></script>
 </head>
 
 <body>
@@ -20,8 +21,9 @@
 
             <a href="/formulario" class="cargar-ver-prod">Cargar productos</a>
 
-            <form action="/buscar" method="get" class="form-busqueda">
-                <input type="text" name="busqueda" placeholder="Buscar productos..." required class="barra-busqueda">
+            <form action="/buscar" method="get" class="form-busqueda" id="buscador">
+                <input type="text" name="busqueda" placeholder="Buscar productos..." required class="barra-busqueda"
+                    id="busqueda">
                 <button type="submit" class="boton">Buscar <svg xmlns="http://www.w3.org/2000/svg" id="lupa-busqueda"
                         viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
                         <path
@@ -33,10 +35,10 @@
     </header>
 
     <main>
-        <div class="div-principal">
+        <div class="div-principal" id="productos">
 
             {{range .}}
-            <div class="productos">
+            <div class="producto">
                 <div class="div-texto">
                     <h2>{{.Nombre}}</h2>
                     <p>{{.Descripcion}}</p>

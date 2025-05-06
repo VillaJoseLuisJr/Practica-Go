@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"html"
 	"html/template"
 	"io"
@@ -20,6 +21,13 @@ type Producto struct {
 	Nombre      string
 	Descripcion string
 	Imagen      sql.NullString
+}
+
+type ProductoJSON struct {
+	ID          int    `json:"id"`
+	Nombre      string `json:"nombre"`
+	Descripcion string `json:"descripcion"`
+	Imagen      string `json:"imagen"`
 }
 
 var templates = template.Must(template.ParseFiles("templates/index.html"))
@@ -46,6 +54,7 @@ func mostrarProductos(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error al leer productos", http.StatusInternalServerError)
 			return
 		}
+
 		productos = append(productos, p)
 	}
 
@@ -178,7 +187,7 @@ func eliminarProducto(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	// Obtener el nombre de la imagen antes de eliminar el producto
-	var imagen string
+	var imagen sql.NullString
 	err := db.QueryRow("SELECT imagen FROM productos WHERE id = ?", id).Scan(&imagen)
 	if err != nil {
 		log.Println("Error al buscar la imagen", err)
@@ -195,10 +204,12 @@ func eliminarProducto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Borrar el archivo de imagen del sistema
-	err = os.Remove("./imagenes/" + imagen)
-	if err != nil && !os.IsNotExist(err) {
-		// Si hubo error distinto de "archivo no existe", mostrarlo
-		log.Println("Error al eliminar imagen:", err)
+	if imagen.Valid {
+		err = os.Remove("./imagenes/" + imagen.String)
+		if err != nil && !os.IsNotExist(err) {
+			// Si hubo error distinto de "archivo no existe", mostrarlo
+			log.Println("Error al eliminar imagen:", err)
+		}
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -206,6 +217,13 @@ func eliminarProducto(w http.ResponseWriter, r *http.Request) {
 
 // Función para barra de busqueda de productos
 func buscarProductos(w http.ResponseWriter, r *http.Request) {
+	// Sólo permitir solicitudes GET
+	if r.Method != http.MethodGet {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Conectar a la base de datos
 	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/emprendimiento_go")
 	if err != nil {
 		log.Println("Error al conectar con la base de datos", err)
@@ -214,9 +232,11 @@ func buscarProductos(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	query := r.FormValue("busqueda")
+	// Obtener el valor de búsqueda desde la URL
+	query := r.URL.Query().Get("busqueda")
 	log.Println("Busqueda recibida:", query)
 
+	// Consulta a la base de datos
 	querySQL := `SELECT id, nombre, descripcion, imagen FROM productos 
 					WHERE nombre LIKE ? OR descripcion LIKE ?`
 
@@ -229,6 +249,7 @@ func buscarProductos(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
+	// Leer los productos encontrados
 	var productos []Producto
 	for rows.Next() {
 		var p Producto
@@ -237,15 +258,34 @@ func buscarProductos(w http.ResponseWriter, r *http.Request) {
 			log.Println("Error al leer producto", err)
 			continue
 		}
+
 		productos = append(productos, p)
 	}
 
-	err = templates.ExecuteTemplate(w, "index.html", productos)
-	if err != nil {
-		log.Println("Error al renderizar resultados:", err)
-		http.Error(w, "Error de servidor", http.StatusInternalServerError)
-		return
+	// Convertir roductos a ProductoJSON
+	var productosJSON []ProductoJSON
+	for _, p := range productos {
+		productoJSON := ProductoJSON{
+			ID:          p.ID,
+			Nombre:      p.Nombre,
+			Descripcion: p.Descripcion,
+		}
+		if p.Imagen.Valid {
+			productoJSON.Imagen = p.Imagen.String
+		}
+		productosJSON = append(productosJSON, productoJSON)
 	}
+
+	// Esablecer el encabezado de respuesta como JSON
+	w.Header().Set("Content-Type", "application/json")
+
+	// Devolver productos como JSON
+	jsonData, err := json.Marshal(productosJSON)
+	if err != nil {
+		log.Println("Error al codificar productos a JSON:", err)
+		http.Error(w, "Error de servidor", http.StatusInternalServerError)
+	}
+	w.Write(jsonData)
 }
 
 func main() {
