@@ -12,6 +12,8 @@
     <script src="https://kit.fontawesome.com/dd34f7d4ea.js" crossorigin="anonymous"></script>
     <script src="/static/buscador.js" defer></script>
     <script src="/static/pruebaAPI.js" defer></script>
+    <script src="/static/apiPokemon.js" defer></script>
+
 
 </head>
 
@@ -83,6 +85,13 @@
 
         <div class="div-principal" id="prueba-API">
 
+        </div>
+
+        <input type="text" id="nombrePokemon" placeholder="Ingrese el nombre del Pokémon" class="barra-busqueda">
+        <button onclick="fetchData()" class="boton">Fetch Pokémon</button>
+
+        <div class="div-principal" id="API-Pokemon">
+            <img src="" alt="Pokemon Sprite" id="pokemonSprite" style="display: none;">
         </div>
     </main>
 
